@@ -1,0 +1,40 @@
+name: Security Assistant CI/CD
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+
+  frontend:
+    name: Frontend test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+      - name: Lint Streamlit app
+        run: python -m py_compile app/main.py && echo "Streamlit OK"
+
+  backend:
+    name: Backend test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+      - name: Run unit tests
+        run: pytest tests/test_unit.py -v --tb=short
+
+  docker-build:
+    name: Docker build
+    runs-on: ubuntu-latest
+    needs: [frontend, backend]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: docker build -t security-assistant .

@@ -1,0 +1,30 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: security-api
+    command: python api.py
+    working_dir: /app
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: security-frontend
+    command: streamlit run main.py --server.port=8501 --server.address=0.0.0.0
+    working_dir: /app
+    ports:
+      - "8501:8501"
+    depends_on:
+      api:
+        condition: service_healthy

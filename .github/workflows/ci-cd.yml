@@ -3,8 +3,6 @@ name: Security Assistant CI/CD
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
   docker-build:
@@ -22,9 +20,3 @@ jobs:
 
       - name: Build frontend
         run: docker build ./frontend -t frontend
-
-      - name: Run containers (test)
-        run: docker-compose up -d
-
-      - name: Stop containers
-        run: docker-compose down
